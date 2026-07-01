@@ -28,11 +28,11 @@ function openAddMember() {
       <button class="btn btn-primary" @click="openAddMember">{{ t('add_member') }}</button>
     </div>
     <div class="member-grid">
-      <template v-if="store.store.members.length === 0">
+      <template v-if="store.members.length === 0">
         <div class="vod-empty" style="grid-column:1/-1">{{ t('no_members') }}</div>
       </template>
       <template v-else>
-        <div v-for="m in store.store.members" :key="m.id" class="member-card" @click="openVodModal(m.id)">
+        <div v-for="m in store.members" :key="m.id" class="member-card" @click="openVodModal(m.id)">
           <div class="avatar">{{ m.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() }}</div>
           <h3 v-html="escapeHtml(m.name)"></h3>
           <p v-html="escapeHtml(m.role)"></p>

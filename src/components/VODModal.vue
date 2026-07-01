@@ -9,7 +9,7 @@ const store = useStore()
 const vodTitle = ref('')
 const vodUrl = ref('')
 
-const member = computed(() => store.store.members.find(m => m.id === store.currentVodMemberId))
+const member = computed(() => store.members.find(m => m.id === store.currentVodMemberId))
 
 function closeModal() {
   store.showVodModal = false

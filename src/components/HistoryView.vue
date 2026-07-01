@@ -10,7 +10,7 @@ const filter = ref('all')
 
 const filteredEvents = computed(() => {
   const now = new Date()
-  let events = store.store.events.filter(ev => new Date(ev.date + 'T' + ev.endTime) < now)
+  let events = store.events.filter(ev => new Date(ev.date + 'T' + ev.endTime) < now)
   if (filter.value !== 'all') events = events.filter(ev => ev.type === filter.value)
   return events.sort((a, b) => new Date(b.date + 'T' + b.startTime) - new Date(a.date + 'T' + a.startTime))
 })
@@ -24,7 +24,7 @@ const colorMap = {
 }
 
 function getParticipantNames(participants) {
-  return participants.map(pid => store.store.members.find(m => m.id === pid)?.name).filter(Boolean).join(', ')
+  return participants.map(pid => store.members.find(m => m.id === pid)?.name).filter(Boolean).join(', ')
 }
 </script>
 

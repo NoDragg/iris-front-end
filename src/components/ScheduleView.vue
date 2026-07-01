@@ -92,11 +92,11 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
           </div>
         </template>
 
-        <template v-if="store.store.members.length === 0">
+        <template v-if="store.members.length === 0">
           <div class="vod-empty" style="grid-column:1/-1;padding:40px 0">{{ t('no_members') }}</div>
         </template>
         <template v-else>
-          <template v-for="m in store.store.members" :key="m.id">
+          <template v-for="m in store.members" :key="m.id">
             <div class="avail-row-header" @click="store.currentVodMemberId = m.id; store.showVodModal = true">
               <div v-html="escapeHtml(m.name)"></div>
               <span v-html="escapeHtml(m.role)"></span>
@@ -137,7 +137,7 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
 
         <template v-for="(d, di) in days" :key="di">
           <div class="cal-cell" :class="{ 'today-col': isoDate(d) === isoDate(today) }" :style="{ height: totalHeight + 'px' }">
-            <template v-for="ev in store.store.events.filter(e => e.date === isoDate(d))" :key="ev.id">
+            <template v-for="ev in store.events.filter(e => e.date === isoDate(d))" :key="ev.id">
               <div class="event-card" :class="'type-' + ev.type" :style="getEventStyle(ev)" @click="editEvent(ev.id)">
                 <b v-html="escapeHtml(ev.title)"></b>
                 <span>{{ ev.startTime }}–{{ ev.endTime }}</span>

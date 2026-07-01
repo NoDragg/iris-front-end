@@ -151,11 +151,11 @@ function deleteEvent() {
       <div class="form-row">
         <label>{{ t('participants') }}</label>
         <div class="participant-picker">
-          <template v-if="store.store.members.length === 0">
+          <template v-if="store.members.length === 0">
             <div class="vod-empty">{{ store.lang === 'vi' ? 'Chưa có thành viên' : 'No members' }}</div>
           </template>
           <template v-else>
-            <div v-for="m in store.store.members" :key="m.id" class="chip" :class="{ selected: form.participants.includes(m.id) }" @click="toggleParticipant(m.id)">
+            <div v-for="m in store.members" :key="m.id" class="chip" :class="{ selected: form.participants.includes(m.id) }" @click="toggleParticipant(m.id)">
               {{ m.name }}
             </div>
           </template>

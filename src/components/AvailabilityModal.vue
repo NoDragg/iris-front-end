@@ -9,7 +9,7 @@ const store = useStore()
 const startHour = ref(9)
 const endHour = ref(17)
 
-const member = computed(() => store.store.members.find(m => m.id === store.currentAvailMemberId))
+const member = computed(() => store.members.find(m => m.id === store.currentAvailMemberId))
 const weekKey = computed(() => isoDate(store.weekStart))
 const days = computed(() => Array.from({ length: 7 }, (_, i) => addDays(store.weekStart, i)))
 

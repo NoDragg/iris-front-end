@@ -8,14 +8,14 @@ const store = useStore()
 
 const selectedId = ref('')
 
-watch(() => store.store.members, () => {
-  if (!selectedId.value || !store.store.members.find(m => m.id === selectedId.value)) {
-    selectedId.value = store.store.members[0]?.id || ''
+watch(() => store.members, () => {
+  if (!selectedId.value || !store.members.find(m => m.id === selectedId.value)) {
+    selectedId.value = store.members[0]?.id || ''
   }
 }, { immediate: true })
 
-const member = computed(() => store.store.members.find(m => m.id === selectedId.value))
-const otherMembers = computed(() => store.store.members.filter(m => m.id !== selectedId.value))
+const member = computed(() => store.members.find(m => m.id === selectedId.value))
+const otherMembers = computed(() => store.members.filter(m => m.id !== selectedId.value))
 
 function updateMeta(field, value) {
   if (member.value) store.updateProfileMeta(member.value.id, field, value)
@@ -73,7 +73,7 @@ function addCoachNote() {
 
 function addPeerFeedback() {
   if (!peerAuthor.value || !peerStatus.value.trim() || !peerStrengths.value.trim() || !peerImprove.value.trim() || !member.value) return
-  const author = store.store.members.find(m => m.id === peerAuthor.value)
+  const author = store.members.find(m => m.id === peerAuthor.value)
   store.addPeerFeedback(member.value.id, peerAuthor.value, author?.name || '', peerStatus.value.trim(), peerStrengths.value.trim(), peerImprove.value.trim())
   peerStatus.value = ''
   peerStrengths.value = ''
@@ -111,8 +111,8 @@ const statusLabels = computed(() => ({
         <p class="eyebrow">{{ t('profile') }}</p>
         <h2>{{ t('member_profile') }}</h2>
       </div>
-      <select class="member-select" v-model="selectedId" v-if="store.store.members.length">
-        <option v-for="m in store.store.members" :key="m.id" :value="m.id">{{ m.name }}</option>
+      <select class="member-select" v-model="selectedId" v-if="store.members.length">
+        <option v-for="m in store.members" :key="m.id" :value="m.id">{{ m.name }}</option>
       </select>
     </div>
 
