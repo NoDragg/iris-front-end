@@ -10,17 +10,18 @@ import VODModal from './components/VODModal.vue'
 import MemberModal from './components/MemberModal.vue'
 import AvailabilityModal from './components/AvailabilityModal.vue'
 import ToastNotification from './components/ToastNotification.vue'
-import { useStore } from './stores/store'
+import { useStore } from './stores/store-api'
 
 const store = useStore()
-onMounted(() => store.init())
+onMounted(() => store.loadAll())
 </script>
 
 <template>
   <div class="app">
     <TopBar />
     <main class="content">
-      <OverviewView v-if="store.activeTab === 'overview'" />
+      <div v-if="store.loading" class="loading">Loading...</div>
+      <OverviewView v-else-if="store.activeTab === 'overview'" />
       <ScheduleView v-else-if="store.activeTab === 'schedule'" />
       <AddScrimView v-else-if="store.activeTab === 'addscrim'" />
       <ProfileView v-else-if="store.activeTab === 'profile'" />
@@ -32,3 +33,13 @@ onMounted(() => store.init())
     <ToastNotification />
   </div>
 </template>
+
+<style scoped>
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #888;
+}
+</style>
