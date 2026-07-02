@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStore, escapeHtml, isoDate } from '../stores/store'
+import { useStore, escapeHtml, isoDate } from '../stores/store-api'
 
 const { t } = useI18n()
 const store = useStore()
@@ -140,9 +140,12 @@ const statusLabels = computed(() => ({
         <div class="stats-block">
           <div v-for="(label, key) in statLabels" :key="key" class="stat-row">
             <div class="stat-row-head"><span>{{ label }}</span><span class="val">{{ member.stats[key] }}</span></div>
-            <div class="stat-bar"><div :style="{ width: member.stats[key] + '%' }"></div></div>
+            <div class="stat-bar"><div class="stat-fill" :style="{ width: member.stats[key] + '%' }"></div></div>
             <input type="range" min="0" max="100" :value="member.stats[key]" @input="updateStat(key, Number($event.target.value))">
           </div>
+          <button class="btn btn-primary save-stats-btn" @click="store.saveProfile(member.id)">
+            {{ t('save') }}
+          </button>
         </div>
       </div>
 

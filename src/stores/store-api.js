@@ -481,6 +481,27 @@ export const useStore = defineStore('iris', () => {
     }
   }
 
+  async function saveProfile(memberId) {
+    const m = getMemberById(memberId)
+    if (!m) return
+    try {
+      const updated = await api.updateMember(memberId, {
+        name: m.name,
+        role: m.role,
+        position: m.position,
+        age: m.age,
+        location: m.location,
+        rank: m.rank,
+        stats: m.stats
+      })
+      const idx = members.value.findIndex(mem => mem.id === memberId)
+      if (idx >= 0) members.value[idx] = updated
+      toastShow(t('toast_member_updated'))
+    } catch (e) {
+      console.error('Save profile error:', e)
+    }
+  }
+
   return {
     members, events, availabilities, activeTab, weekStart, selectedProfileId,
     currentVodMemberId, lang, scheduleMode, toast,
@@ -495,7 +516,8 @@ export const useStore = defineStore('iris', () => {
     setAvailability, clearAvailability, getAvailability,
     addLeaderNote, deleteLeaderNote,
     addCoachNote, deleteCoachNote,
-    addPeerFeedback, deletePeerFeedback
+    addPeerFeedback, deletePeerFeedback,
+    saveProfile
   }
 })
 
