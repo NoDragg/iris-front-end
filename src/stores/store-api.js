@@ -311,6 +311,18 @@ export const useStore = defineStore('iris', () => {
 
   function getMemberById(id) { return members.value.find(m => m.id === id) }
 
+  function updateProfileMeta(id, field, value) {
+    const m = getMemberById(id)
+    if (m) m[field] = field === 'age' ? parseInt(value) || null : value
+  }
+
+  function updateProfileStats(id, stats) {
+    const m = getMemberById(id)
+    if (m && m.stats) {
+      Object.assign(m.stats, stats)
+    }
+  }
+
   async function updateStats(id, stats) {
     try {
       const updated = await api.updateStats(id, stats)
@@ -517,6 +529,7 @@ export const useStore = defineStore('iris', () => {
     addLeaderNote, deleteLeaderNote,
     addCoachNote, deleteCoachNote,
     addPeerFeedback, deletePeerFeedback,
+    updateProfileMeta, updateProfileStats,
     saveProfile
   }
 })
