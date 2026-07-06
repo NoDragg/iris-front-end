@@ -349,6 +349,16 @@ export const useStore = defineStore('iris', () => {
     if (m) { m.stats = { ...m.stats, ...stats }; saveStore() }
   }
 
+  async function uploadAvatar(id, file) {
+    try {
+      const res = await api.uploadAvatar(id, file)
+      const m = getMemberById(id)
+      if (m && res.avatarUrl) { m.avatarUrl = res.avatarUrl; saveStore() }
+    } catch (e) {
+      console.error('Upload avatar error', e)
+    }
+  }
+
   function addLeaderNote(memberId, text) {
     const m = getMemberById(memberId)
     if (m) { m.leaderNotes.push({ id: uid('note'), text, date: isoDate(new Date()) }); saveStore() }
@@ -396,7 +406,8 @@ export const useStore = defineStore('iris', () => {
     updateProfileMeta, updateProfileStats,
     addLeaderNote, deleteLeaderNote,
     addCoachNote, deleteCoachNote,
-    addPeerFeedback, deletePeerFeedback
+    addPeerFeedback, deletePeerFeedback,
+    uploadAvatar
   }
 })
 

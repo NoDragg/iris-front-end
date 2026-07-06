@@ -57,7 +57,14 @@ export const api = {
   // VODs
   getVods: (memberId) => request('GET', '/members/' + memberId + '/vods'),
   addVod: (memberId, data) => request('POST', '/members/' + memberId + '/vods', data),
-  deleteVod: (vodId) => request('DELETE', '/vods/' + vodId)
+  deleteVod: (vodId) => request('DELETE', '/vods/' + vodId),
+
+  // Avatar
+  uploadAvatar: (memberId, file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return fetch(API_BASE + '/members/' + memberId + '/avatar', { method: 'POST', body: formData }).then(r => r.json())
+  }
 }
 
 export default api

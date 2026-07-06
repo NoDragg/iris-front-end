@@ -30,10 +30,11 @@ function updateStat(key, value) {
 function handleAvatarUpload(e) {
   const file = e.target.files[0]
   if (!file || !member.value) return
+  // Resize client-side, upload to BE → Cloudinary
   const reader = new FileReader()
   reader.onload = () => {
     const img = new Image()
-    img.onload = () => {
+    img.onload = async () => {
       const canvas = document.createElement('canvas')
       const size = 160
       canvas.width = size
@@ -43,8 +44,11 @@ function handleAvatarUpload(e) {
       const w = img.width * scale
       const h = img.height * scale
       ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h)
-      member.value.avatar = canvas.toDataURL('image/jpeg', 0.85)
-      store.saveStore()
+      canvas.toBlob(async (blob) => {
+        if (!blob) return
+        const resizedFile = new File([blob], file.name, { type: 'image/jpeg' })
+        await store.uploadAvatar(member.value.id, resizedFile)
+      }, 'image/jpeg', 0.85)
     }
     img.src = reader.result
   }
@@ -120,10 +124,10 @@ const statusLabels = computed(() => ({
 
     <div v-else class="profile-grid">
       <div class="profile-card">
-        <div class="profile-avatar" v-if="!member.avatar">
+        <div class="profile-avatar" v-if="!member.avatarUrl">
           {{ member.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() }}
         </div>
-        <img v-else :src="member.avatar" class="profile-avatar" style="object-fit:cover" alt="">
+        <img v-else :src="member.avatarUrl" class="profile-avatar" style="object-fit:cover" alt="">
         <label class="avatar-upload">{{ t('change_avatar') }}
           <input type="file" accept="image/*" style="display:none" @change="handleAvatarUpload">
         </label>
