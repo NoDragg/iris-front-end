@@ -316,6 +316,17 @@ export const useStore = defineStore('iris', () => {
     if (m) m[field] = field === 'age' ? parseInt(value) || null : value
   }
 
+  async function uploadAvatar(id, file) {
+    try {
+      const res = await api.uploadAvatar(id, file)
+      const m = getMemberById(id)
+      if (m && res.avatarUrl) m.avatarUrl = res.avatarUrl
+      toastShow(t('toast_member_updated'))
+    } catch (e) {
+      console.error('Upload avatar error:', e)
+    }
+  }
+
   function updateProfileStats(id, stats) {
     const m = getMemberById(id)
     if (m && m.stats) {
@@ -530,6 +541,7 @@ export const useStore = defineStore('iris', () => {
     addCoachNote, deleteCoachNote,
     addPeerFeedback, deletePeerFeedback,
     updateProfileMeta, updateProfileStats,
+    uploadAvatar,
     saveProfile
   }
 })

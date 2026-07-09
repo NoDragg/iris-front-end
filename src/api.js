@@ -64,7 +64,10 @@ export const api = {
     const formData = new FormData()
     formData.append('file', file)
     return fetch(API_BASE + '/members/' + memberId + '/avatar', { method: 'POST', body: formData }).then(r => r.json())
-  }
+  },
+
+  // Keep-alive ping - chống server Render sleep. BE không có /health nên dùng /members.
+  ping: () => request('GET', '/members').then(() => true).catch(() => false)
 }
 
 export default api
