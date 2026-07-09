@@ -27,6 +27,13 @@ function updateStat(key, value) {
   }
 }
 
+async function removeMember() {
+  if (!member.value) return
+  if (!confirm(t('confirm_delete_member').replace('{name}', member.value.name))) return
+  await store.deleteMember(member.value.id)
+  selectedId.value = store.members[0]?.id || ''
+}
+
 // ── Avatar cropper ──────────────────────────────────────────────
 const OUT_SIZE = 160        // ảnh xuất ra (px)
 const BOX = 280             // khung crop hiển thị (px)
@@ -226,6 +233,9 @@ const statusLabels = computed(() => ({
           </div>
           <button class="btn btn-primary save-stats-btn" @click="store.saveProfile(member.id)">
             {{ t('save') }}
+          </button>
+          <button class="btn btn-danger save-stats-btn" @click="removeMember">
+            {{ t('delete_member_btn') }}
           </button>
         </div>
       </div>
