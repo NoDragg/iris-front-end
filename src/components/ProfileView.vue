@@ -2,11 +2,13 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore, escapeHtml } from '../stores/store-api'
+import DeleteMemberModal from './DeleteMemberModal.vue'
 
 const { t } = useI18n()
 const store = useStore()
 
 const selectedId = ref('')
+const showDeleteModal = ref(false)
 
 watch(() => store.members, () => {
   if (!selectedId.value || !store.members.find(m => m.id === selectedId.value)) {
@@ -29,7 +31,11 @@ function updateStat(key, value) {
 
 async function removeMember() {
   if (!member.value) return
-  if (!confirm(t('confirm_delete_member').replace('{name}', member.value.name))) return
+  showDeleteModal.value = true
+}
+
+async function confirmDeleteMember() {
+  showDeleteModal.value = false
   await store.deleteMember(member.value.id)
   selectedId.value = store.members[0]?.id || ''
 }
@@ -316,6 +322,13 @@ const statusLabels = computed(() => ({
         </div>
       </div>
     </div>
+
+    <DeleteMemberModal
+      :show="showDeleteModal"
+      :member-name="member?.name"
+      @confirm="confirmDeleteMember"
+      @cancel="showDeleteModal = false"
+    />
 
     <!-- Avatar cropper -->
     <Teleport to="body">

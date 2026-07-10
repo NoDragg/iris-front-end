@@ -2,9 +2,12 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore, escapeHtml } from '../stores/store'
+import DeleteMemberModal from './DeleteMemberModal.vue'
 
 const { t } = useI18n()
 const store = useStore()
+
+const showDeleteModal = ref(false)
 
 const vodTitle = ref('')
 const vodUrl = ref('')
@@ -38,10 +41,13 @@ function openEditMember() {
 
 function deleteMember() {
   if (!member.value) return
-  if (confirm(t('confirm_delete_member').replace('{name}', member.value.name))) {
-    store.deleteMember(member.value.id)
-    closeModal()
-  }
+  showDeleteModal.value = true
+}
+
+function confirmDeleteMember() {
+  store.deleteMember(member.value.id)
+  showDeleteModal.value = false
+  closeModal()
 }
 </script>
 
@@ -80,4 +86,11 @@ function deleteMember() {
       </div>
     </div>
   </Teleport>
+
+  <DeleteMemberModal
+    :show="showDeleteModal"
+    :member-name="member?.name"
+    @confirm="confirmDeleteMember"
+    @cancel="showDeleteModal = false"
+  />
 </template>
