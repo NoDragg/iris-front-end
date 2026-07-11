@@ -70,6 +70,10 @@ export default {
   send_vod: "Send VOD",
   edit_member_btn: "Edit Name / Role",
   delete_member_btn: "Delete Member",
+  delete: "Delete",
+  delete_note: "Delete note",
+  confirm_delete_note: "Delete this note?",
+  confirm_delete_feedback: "Delete this feedback?",
   edit_member_title: "Edit Member",
   add_member_title: "Add Member",
   name: "Name",
@@ -102,5 +106,7 @@ export default {
   err_time_range: "End hour must be greater than start hour!",
   day_names: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
   no_vods: "No videos submitted.",
-  no_other_teammates: "no other teammates"
+  no_other_teammates: "no other teammates",
+  loading: "Loading...",
+  error: "Connection error"
 }

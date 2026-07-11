@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStore, escapeHtml } from '../stores/store-api'
-import DeleteMemberModal from './DeleteMemberModal.vue'
+import { useStore, escapeHtml } from '../stores/store'
+import Popup from './Popup.vue'
 
 const { t } = useI18n()
 const store = useStore()
@@ -14,6 +14,11 @@ watch(() => store.members, () => {
   if (!selectedId.value || !store.members.find(m => m.id === selectedId.value)) {
     selectedId.value = store.members[0]?.id || ''
   }
+}, { immediate: true })
+
+// Load review/vod khi chọn member (getMembers không trả kèm)
+watch(selectedId, (id) => {
+  if (id) store.loadMemberDetails(id)
 }, { immediate: true })
 
 const member = computed(() => store.members.find(m => m.id === selectedId.value))
@@ -174,14 +179,33 @@ function addPeerFeedback() {
   peerImprove.value = ''
 }
 
-function deleteNote(type, noteId) {
+// Confirm xóa dùng chung cho note/coach/peer/member
+const pendingDelete = ref(null)   // { title, message, run }
+
+function askDeleteNote(type, noteId) {
   if (!member.value) return
-  if (type === 'leader') store.deleteLeaderNote(member.value.id, noteId)
-  else store.deleteCoachNote(member.value.id, noteId)
+  pendingDelete.value = {
+    title: t('delete_note'),
+    message: t('confirm_delete_note'),
+    run: () => type === 'leader'
+      ? store.deleteLeaderNote(member.value.id, noteId)
+      : store.deleteCoachNote(member.value.id, noteId)
+  }
 }
 
-function deletePeer(feedbackId) {
-  if (member.value) store.deletePeerFeedback(member.value.id, feedbackId)
+function askDeletePeer(feedbackId) {
+  if (!member.value) return
+  pendingDelete.value = {
+    title: t('delete'),
+    message: t('confirm_delete_feedback'),
+    run: () => store.deletePeerFeedback(member.value.id, feedbackId)
+  }
+}
+
+async function confirmPendingDelete() {
+  const p = pendingDelete.value
+  pendingDelete.value = null
+  if (p) await p.run()
 }
 
 const statLabels = computed(() => ({
@@ -253,9 +277,11 @@ const statusLabels = computed(() => ({
           <div class="note-list">
             <template v-if="member.leaderNotes?.length">
               <div v-for="n in [...member.leaderNotes].reverse()" :key="n.id" class="note-item">
-                <span class="note-del" @click="deleteNote('leader', n.id)">✕</span>
                 <span v-html="escapeHtml(n.text)"></span>
-                <span class="note-date">{{ n.date }}</span>
+                <div class="note-foot">
+                  <span class="note-date">{{ n.date }}</span>
+                  <button class="btn btn-danger btn-small" @click="askDeleteNote('leader', n.id)">{{ t('delete') }}</button>
+                </div>
               </div>
             </template>
             <div v-else class="vod-empty">{{ t('no_notes') }}</div>
@@ -272,10 +298,12 @@ const statusLabels = computed(() => ({
           <div class="note-list">
             <template v-if="member.coachNotes?.length">
               <div v-for="n in [...member.coachNotes].reverse()" :key="n.id" class="note-item">
-                <span class="note-del" @click="deleteNote('coach', n.id)">✕</span>
                 <span class="status-tag" :class="'status-' + n.status">{{ statusLabels[n.status] }}</span>
                 <span v-html="escapeHtml(n.text)"></span>
-                <span class="note-date">{{ n.date }}</span>
+                <div class="note-foot">
+                  <span class="note-date">{{ n.date }}</span>
+                  <button class="btn btn-danger btn-small" @click="askDeleteNote('coach', n.id)">{{ t('delete') }}</button>
+                </div>
               </div>
             </template>
             <div v-else class="vod-empty">{{ t('no_notes') }}</div>
@@ -299,12 +327,14 @@ const statusLabels = computed(() => ({
               <div v-for="p in [...member.peerFeedback].reverse()" :key="p.id" class="peer-item">
                 <div class="peer-head">
                   <span class="peer-author" v-html="escapeHtml(p.authorName)"></span>
-                  <span class="note-del" @click="deletePeer(p.id)">✕</span>
                 </div>
                 <div class="peer-field"><b>{{ t('in_game_state') }}</b><span v-html="escapeHtml(p.status)"></span></div>
                 <div class="peer-field"><b>{{ t('strengths') }}</b><span v-html="escapeHtml(p.strengths)"></span></div>
                 <div class="peer-field"><b>{{ t('improve') }}</b><span v-html="escapeHtml(p.improve)"></span></div>
-                <div class="note-date">{{ p.date }}</div>
+                <div class="note-foot">
+                  <span class="note-date">{{ p.date }}</span>
+                  <button class="btn btn-danger btn-small" @click="askDeletePeer(p.id)">{{ t('delete') }}</button>
+                </div>
               </div>
             </template>
             <div v-else class="vod-empty">{{ t('no_peer_feedback') }}</div>
@@ -323,11 +353,21 @@ const statusLabels = computed(() => ({
       </div>
     </div>
 
-    <DeleteMemberModal
+    <Popup
       :show="showDeleteModal"
-      :member-name="member?.name"
+      :title="`${t('delete_member_btn')} “${member?.name || ''}”`"
+      :message="t('confirm_delete_member', { name: member?.name })"
+      :confirm-label="t('delete_member_btn')"
       @confirm="confirmDeleteMember"
       @cancel="showDeleteModal = false"
+    />
+
+    <Popup
+      :show="!!pendingDelete"
+      :title="pendingDelete?.title"
+      :message="pendingDelete?.message"
+      @confirm="confirmPendingDelete"
+      @cancel="pendingDelete = null"
     />
 
     <!-- Avatar cropper -->
@@ -363,6 +403,14 @@ const statusLabels = computed(() => ({
 </template>
 
 <style scoped>
+.note-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+.note-foot .note-date { margin-top: 0; }
 .crop-modal {
   position: relative;
   background: var(--bg-panel);

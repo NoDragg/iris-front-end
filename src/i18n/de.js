@@ -70,6 +70,10 @@ export default {
   send_vod: "VOD senden",
   edit_member_btn: "Name / Rolle bearbeiten",
   delete_member_btn: "Mitglied löschen",
+  delete: "Löschen",
+  delete_note: "Notiz löschen",
+  confirm_delete_note: "Diese Notiz löschen?",
+  confirm_delete_feedback: "Dieses Feedback löschen?",
   edit_member_title: "Mitglied bearbeiten",
   add_member_title: "Mitglied hinzufügen",
   name: "Name",
@@ -102,5 +106,7 @@ export default {
   err_time_range: "Endzeit muss größer als Startzeit sein!",
   day_names: ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'],
   no_vods: "Keine Videos gesendet.",
-  no_other_teammates: "keine anderen Mitspieler"
+  no_other_teammates: "keine anderen Mitspieler",
+  loading: "Wird geladen...",
+  error: "Verbindungsfehler"
 }

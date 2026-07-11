@@ -10,8 +10,10 @@ import VODModal from './components/VODModal.vue'
 import MemberModal from './components/MemberModal.vue'
 import AvailabilityModal from './components/AvailabilityModal.vue'
 import ToastNotification from './components/ToastNotification.vue'
-import { useStore } from './stores/store-api'
+import { useI18n } from 'vue-i18n'
+import { useStore } from './stores/store'
 
+const { t } = useI18n()
 const store = useStore()
 onMounted(() => store.loadAll())
 </script>
@@ -20,7 +22,7 @@ onMounted(() => store.loadAll())
   <div class="app">
     <TopBar />
     <main class="content">
-      <div v-if="store.loading" class="loading">Loading...</div>
+      <div v-if="store.loading" class="loading">{{ t('loading') }}</div>
       <OverviewView v-else-if="store.activeTab === 'overview'" />
       <ScheduleView v-else-if="store.activeTab === 'schedule'" />
       <AddScrimView v-else-if="store.activeTab === 'addscrim'" />

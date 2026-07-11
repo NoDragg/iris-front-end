@@ -70,6 +70,10 @@ export default {
   send_vod: "Pošlji VOD",
   edit_member_btn: "Uredi ime / vlogo",
   delete_member_btn: "Izbriši člana",
+  delete: "Izbriši",
+  delete_note: "Izbriši opombo",
+  confirm_delete_note: "Izbriši to opombo?",
+  confirm_delete_feedback: "Izbriši to oceno?",
   edit_member_title: "Uredi člana",
   add_member_title: "Dodaj člana",
   name: "Ime",
@@ -102,5 +106,7 @@ export default {
   err_time_range: "Končna ura mora biti večja od začetne!",
   day_names: ['PON', 'TOR', 'SRE', 'ČET', 'PET', 'SOB', 'NED'],
   no_vods: "Ni poslanih videov.",
-  no_other_teammates: "ni drugih soigralcev"
+  no_other_teammates: "ni drugih soigralcev",
+  loading: "Nalaganje...",
+  error: "Napaka povezave"
 }

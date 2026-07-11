@@ -40,24 +40,25 @@ export const api = {
   // Availability
   getAvailability: (week) => request('GET', '/availability?week=' + week),
   setAvailability: (memberId, data) => request('PUT', '/members/' + memberId + '/availability', data),
+  deleteAvailabilitySlot: (memberId, dayIndex, week) => request('DELETE', '/members/' + memberId + '/availability/' + dayIndex + '?week=' + week),
 
   // Notes & Feedback
   getLeaderNotes: (memberId) => request('GET', '/members/' + memberId + '/leader-notes'),
   addLeaderNote: (memberId, data) => request('POST', '/members/' + memberId + '/leader-notes', data),
-  deleteLeaderNote: (noteId) => request('DELETE', '/leader-notes/' + noteId),
+  deleteLeaderNote: (noteId) => request('DELETE', '/members/leader-notes/' + noteId),
 
   getCoachNotes: (memberId) => request('GET', '/members/' + memberId + '/coach-notes'),
   addCoachNote: (memberId, data) => request('POST', '/members/' + memberId + '/coach-notes', data),
-  deleteCoachNote: (noteId) => request('DELETE', '/coach-notes/' + noteId),
+  deleteCoachNote: (noteId) => request('DELETE', '/members/coach-notes/' + noteId),
 
   getPeerFeedback: (memberId) => request('GET', '/members/' + memberId + '/peer-feedback'),
   addPeerFeedback: (memberId, data) => request('POST', '/members/' + memberId + '/peer-feedback', data),
-  deletePeerFeedback: (id) => request('DELETE', '/peer-feedback/' + id),
+  deletePeerFeedback: (id) => request('DELETE', '/members/peer-feedback/' + id),
 
   // VODs
   getVods: (memberId) => request('GET', '/members/' + memberId + '/vods'),
   addVod: (memberId, data) => request('POST', '/members/' + memberId + '/vods', data),
-  deleteVod: (vodId) => request('DELETE', '/vods/' + vodId),
+  deleteVod: (vodId) => request('DELETE', '/members/vods/' + vodId),
 
   // Avatar
   uploadAvatar: (memberId, file) => {

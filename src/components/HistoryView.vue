@@ -2,11 +2,19 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore, escapeHtml, fmtDateLang } from '../stores/store'
+import Popup from './Popup.vue'
 
 const { t } = useI18n()
 const store = useStore()
 
 const filter = ref('all')
+const pendingDelete = ref(null)   // event id chờ xóa
+
+function confirmDelete() {
+  const id = pendingDelete.value
+  pendingDelete.value = null
+  if (id) store.deleteEvent(id)
+}
 
 const filteredEvents = computed(() => {
   const now = new Date()
@@ -49,7 +57,7 @@ function getParticipantNames(participants) {
 
     <div class="history-list">
       <div v-for="ev in filteredEvents" :key="ev.id" class="history-item" :style="{ borderLeftColor: colorMap[ev.type] || 'var(--border-hair-2)' }">
-        <div class="h-date">{{ fmtDateLang(ev.date, store.lang) }}</div>
+        <div class="h-date">{{ fmtDateLang(ev.date, $i18n.locale) }}</div>
         <div style="flex:1">
           <div class="h-title">
             <span v-html="escapeHtml(ev.title)"></span>
@@ -61,7 +69,16 @@ function getParticipantNames(participants) {
             <template v-if="ev.participants?.length"> · {{ getParticipantNames(ev.participants) }}</template>
           </div>
         </div>
+        <button class="btn btn-danger btn-small" @click="pendingDelete = ev.id">{{ t('delete') }}</button>
       </div>
     </div>
+
+    <Popup
+      :show="!!pendingDelete"
+      :title="t('delete_event')"
+      :message="t('confirm_delete_event')"
+      @confirm="confirmDelete"
+      @cancel="pendingDelete = null"
+    />
   </section>
 </template>

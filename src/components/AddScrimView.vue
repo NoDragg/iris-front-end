@@ -2,11 +2,13 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore, isoDate, escapeHtml } from '../stores/store'
+import Popup from './Popup.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const store = useStore()
 
 const eventId = ref('')
+const showDelete = ref(false)
 const form = ref({
   title: '',
   type: 'Practice',
@@ -59,13 +61,13 @@ function resetForm() {
 
 function updateMapPreview() {
   if (!form.value.map) { mapPreview.value = ''; return }
-  const openMapLabel = store.lang === 'vi' ? 'Mở bản đồ trong tab mới ↗' : 'Open map in new tab ↗'
+  const openMapLabel = locale.value === 'vi' ? 'Mở bản đồ trong tab mới ↗' : 'Open map in new tab ↗'
   if (/^https?:\/\//i.test(form.value.map)) {
     mapPreview.value = `<iframe src="${escapeHtml(form.value.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       <a href="${escapeHtml(form.value.map)}" target="_blank" rel="noopener">${openMapLabel}</a>`
   } else {
     const q = encodeURIComponent(form.value.map)
-    const searchLabel = (store.lang === 'vi' ? 'Tìm' : 'Search') + ` "${escapeHtml(form.value.map)}" ` + (store.lang === 'vi' ? 'trên Google Maps ↗' : 'on Google Maps ↗')
+    const searchLabel = (locale.value === 'vi' ? 'Tìm' : 'Search') + ` "${escapeHtml(form.value.map)}" ` + (locale.value === 'vi' ? 'trên Google Maps ↗' : 'on Google Maps ↗')
     mapPreview.value = `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">${searchLabel}</a>`
   }
 }
@@ -152,7 +154,7 @@ function deleteEvent() {
         <label>{{ t('participants') }}</label>
         <div class="participant-picker">
           <template v-if="store.members.length === 0">
-            <div class="vod-empty">{{ store.lang === 'vi' ? 'Chưa có thành viên' : 'No members' }}</div>
+            <div class="vod-empty">{{ $i18n.locale === 'vi' ? 'Chưa có thành viên' : 'No members' }}</div>
           </template>
           <template v-else>
             <div v-for="m in store.members" :key="m.id" class="chip" :class="{ selected: form.participants.includes(m.id) }" @click="toggleParticipant(m.id)">

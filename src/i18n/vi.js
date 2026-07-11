@@ -70,6 +70,10 @@ export default {
   send_vod: "Gửi VOD",
   edit_member_btn: "Sửa tên / role",
   delete_member_btn: "Xóa thành viên",
+  delete: "Xóa",
+  delete_note: "Xóa ghi chú",
+  confirm_delete_note: "Xóa ghi chú này?",
+  confirm_delete_feedback: "Xóa đánh giá này?",
   edit_member_title: "Sửa thành viên",
   add_member_title: "Thêm thành viên",
   name: "Tên",
@@ -102,5 +106,7 @@ export default {
   err_time_range: "Giờ kết thúc phải lớn hơn giờ bắt đầu!",
   day_names: ['Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7', 'CN'],
   no_vods: "Chưa có video nào được gửi.",
-  no_other_teammates: "không có đồng đội khác"
+  no_other_teammates: "không có đồng đội khác",
+  loading: "Đang tải...",
+  error: "Lỗi kết nối"
 }

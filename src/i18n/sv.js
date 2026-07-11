@@ -70,6 +70,10 @@ export default {
   send_vod: "Skicka VOD",
   edit_member_btn: "Redigera namn / roll",
   delete_member_btn: "Ta bort medlem",
+  delete: "Ta bort",
+  delete_note: "Ta bort anteckning",
+  confirm_delete_feedback: "Ta bort denna feedback?",
+  confirm_delete_note: "Ta bort denna anteckning?",
   edit_member_title: "Redigera medlem",
   add_member_title: "Lägg till medlem",
   name: "Namn",
@@ -102,5 +106,7 @@ export default {
   err_time_range: "Sluttid måste vara senare än starttid!",
   day_names: ['MÅN', 'Tis', 'ONS', 'TOR', 'FRE', 'LÖR', 'SÖN'],
   no_vods: "Inga videor skickade.",
-  no_other_teammates: "inga andra lagkamrater"
+  no_other_teammates: "inga andra lagkamrater",
+  loading: "Laddar...",
+  error: "Anslutningsfel"
 }

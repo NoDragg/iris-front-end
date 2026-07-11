@@ -3,25 +3,21 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore, addDays, isoDate, mondayOf, escapeHtml } from '../stores/store'
 
-const { t } = useI18n()
+const { t, tm, locale } = useI18n()
 const store = useStore()
 
 const days = computed(() => Array.from({ length: 7 }, (_, i) => addDays(store.weekStart, i)))
 const weekKey = computed(() => isoDate(store.weekStart))
 const today = new Date()
 
-function prevWeek() { store.weekStart = addDays(store.weekStart, -7) }
-function nextWeek() { store.weekStart = addDays(store.weekStart, 7) }
-function goToday() { store.weekStart = mondayOf(new Date()) }
+function prevWeek() { store.weekStart = addDays(store.weekStart, -7); store.loadAllAvailabilities?.() }
+function nextWeek() { store.weekStart = addDays(store.weekStart, 7); store.loadAllAvailabilities?.() }
+function goToday() { store.weekStart = mondayOf(new Date()); store.loadAllAvailabilities?.() }
 
 function openAvailabilityModal(memberId, dayIndex) {
   store.currentAvailMemberId = memberId
   store.currentAvailDayIndex = dayIndex
   store.showAvailabilityModal = true
-}
-
-function getAvailability(memberId, dayIndex) {
-  return store.getAvailability(weekKey.value, memberId, dayIndex)
 }
 
 function editEvent(eventId) {
@@ -50,7 +46,22 @@ function fmtRange(start, locale) {
   return `${start.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}, ${end.getFullYear()}`
 }
 
-const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
+function fmtTime(hour) {
+  const h = Math.floor(hour)
+  const m = Math.round((hour - h) * 60)
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
+
+const dayNames = computed(() => tm('day_names') || [])
+
+const dateLocale = computed(() => locale.value === 'vi' ? 'vi-VN' : 'en-US')
+
+// ponytail: reactive lookup - track all availabilities access for Vue dependency tracking
+const availMap = computed(() => store.availabilities)
+
+function getSlot(memberId, dayIndex) {
+  return availMap.value?.[weekKey.value]?.[memberId]?.[dayIndex]
+}
 </script>
 
 <template>
@@ -68,7 +79,7 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
         <button class="btn btn-icon" @click="prevWeek">‹</button>
         <button class="btn btn-icon" @click="nextWeek">›</button>
       </div>
-      <div class="cal-range">{{ fmtRange(store.weekStart, locale).toUpperCase() }}</div>
+      <div class="cal-range">{{ fmtRange(store.weekStart, dateLocale).toUpperCase() }}</div>
       <div class="schedule-mode-toggle">
         <button class="btn btn-toggle" :class="{ active: store.scheduleMode === 'availability' }" @click="store.scheduleMode = 'availability'">
           {{ t('availability_view') }}
@@ -85,9 +96,9 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
         <div class="avail-head-cell">{{ t('member_col') }}</div>
         <template v-for="(d, i) in days" :key="i">
           <div class="avail-head-cell">
-            <div>{{ t('day_names')[i] }}</div>
+            <div>{{ dayNames[i] }}</div>
             <div style="font-size:10px;font-weight:normal;margin-top:2px;color:var(--text-muted)">
-              {{ d.toLocaleDateString(locale, { month: 'short', day: 'numeric' }) }}
+              {{ d.toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' }) }}
             </div>
           </div>
         </template>
@@ -103,9 +114,9 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
             </div>
             <template v-for="(d, i) in days" :key="i">
               <div class="avail-cell" @click="openAvailabilityModal(m.id, i)">
-                <template v-if="getAvailability(m.id, i)">
+                <template v-if="getSlot(m.id, i)">
                   <span class="avail-time-slot">
-                    {{ String(getAvailability(m.id, i).start).padStart(2, '0') }}:00 – {{ String(getAvailability(m.id, i).end).padStart(2, '0') }}:00
+                    {{ fmtTime(getSlot(m.id, i).start) }} – {{ fmtTime(getSlot(m.id, i).end) }}
                   </span>
                 </template>
                 <template v-else>
@@ -122,8 +133,8 @@ const locale = computed(() => store.lang === 'vi' ? 'vi-VN' : 'en-US')
         <div class="cal-corner"></div>
         <template v-for="(d, i) in days" :key="i">
           <div class="cal-day-head" :class="{ today: isoDate(d) === isoDate(today) }">
-            <div class="dow">{{ t('day_names')[i] }}</div>
-            <div class="dom">{{ d.toLocaleDateString(locale, { month: 'short', day: 'numeric' }) }}</div>
+            <div class="dow">{{ dayNames[i] }}</div>
+            <div class="dom">{{ d.toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' }) }}</div>
           </div>
         </template>
 
