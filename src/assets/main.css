@@ -203,6 +203,7 @@ textarea{ resize:vertical; }
 .map-preview{ margin-top:6px; }
 .map-preview iframe{ width:100%; height:180px; border:0; border-radius:8px; }
 .map-preview a{ color:var(--red-bright); font-size:12.5px; }
+.map-preview a.map-link{ display:inline-block; padding:14px 18px; border:1px dashed var(--red-bright); border-radius:8px; font-size:13px; }
 
 /* ---------- PROFILE ---------- */
 .member-select{ min-width:200px; }

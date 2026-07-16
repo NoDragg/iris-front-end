@@ -61,13 +61,26 @@ function resetForm() {
 
 function updateMapPreview() {
   if (!form.value.map) { mapPreview.value = ''; return }
+  const raw = form.value.map.trim()
   const openMapLabel = locale.value === 'vi' ? 'Mở bản đồ trong tab mới ↗' : 'Open map in new tab ↗'
-  if (/^https?:\/\//i.test(form.value.map)) {
-    mapPreview.value = `<iframe src="${escapeHtml(form.value.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a href="${escapeHtml(form.value.map)}" target="_blank" rel="noopener">${openMapLabel}</a>`
+  if (/^https?:\/\//i.test(raw)) {
+    const safeHref = escapeHtml(raw)
+    // Try to extract lat,lng from common long-form patterns so the embed centers on the place.
+    // Short links (maps.app.goo.gl, goo.gl/maps) have no coords here — embed falls back, show link CTA.
+    const coordMatch = raw.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
+        || raw.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)
+    if (coordMatch) {
+      const src = `https://www.google.com/maps?q=${encodeURIComponent(coordMatch[1])},${encodeURIComponent(coordMatch[2])}&z=15&output=embed`
+      const safeSrc = escapeHtml(src)
+      mapPreview.value = `<iframe src="${safeSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a href="${safeHref}" target="_blank" rel="noopener">${openMapLabel}</a>`
+    } else {
+      // Short link or no coords — embed lands at world view. Show link button instead of empty iframe.
+      mapPreview.value = `<a class="map-link" href="${safeHref}" target="_blank" rel="noopener">${openMapLabel}</a>`
+    }
   } else {
-    const q = encodeURIComponent(form.value.map)
-    const searchLabel = (locale.value === 'vi' ? 'Tìm' : 'Search') + ` "${escapeHtml(form.value.map)}" ` + (locale.value === 'vi' ? 'trên Google Maps ↗' : 'on Google Maps ↗')
+    const q = encodeURIComponent(raw)
+    const searchLabel = (locale.value === 'vi' ? 'Tìm' : 'Search') + ` "${escapeHtml(raw)}" ` + (locale.value === 'vi' ? 'trên Google Maps ↗' : 'on Google Maps ↗')
     mapPreview.value = `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">${searchLabel}</a>`
   }
 }
@@ -92,12 +105,15 @@ function submit() {
 
 function deleteEvent() {
   if (!eventId.value) return
-  if (confirm(t('confirm_delete_event'))) {
-    store.deleteEvent(eventId.value)
-    store.editEventId = null
-    resetForm()
-    store.setTab('schedule')
-  }
+  showDelete.value = true
+}
+
+function confirmDelete() {
+  store.deleteEvent(eventId.value)
+  showDelete.value = false
+  store.editEventId = null
+  resetForm()
+  store.setTab('schedule')
 }
 </script>
 
@@ -172,5 +188,13 @@ function deleteEvent() {
         <button type="submit" class="btn btn-primary">{{ t('save_view_schedule') }}</button>
       </div>
     </form>
+
+    <Popup
+      :show="showDelete"
+      :title="t('delete_event')"
+      :message="t('confirm_delete_event')"
+      @confirm="confirmDelete"
+      @cancel="showDelete = false"
+    />
   </section>
 </template>
