@@ -33,7 +33,8 @@ function openAddMember() {
       </template>
       <template v-else>
         <div v-for="m in store.members" :key="m.id" class="member-card" @click="openVodModal(m.id)">
-          <div class="avatar">{{ m.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() }}</div>
+          <img v-if="m.avatarUrl" :src="m.avatarUrl" class="avatar" alt="" style="object-fit:cover">
+          <div v-else class="avatar">{{ m.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() }}</div>
           <h3 v-html="escapeHtml(m.name)"></h3>
           <p v-html="escapeHtml(m.role)"></p>
           <div class="vod-count">{{ (m.vods || []).length }} {{ t('sent_vods') }}</div>
